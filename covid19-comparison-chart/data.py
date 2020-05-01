@@ -1,0 +1,69 @@
+import csv, json
+import openpyxl as xl
+
+monthsDays = {
+    1:31,
+    2:29,
+    3:31,
+    4:30,
+    5:31,
+    6:30,
+    7:31,
+    8:31,
+    9:30,
+    10:31,
+    11:30,
+    12:31
+}
+
+class Date:
+    day = 0
+    month = 0
+    year = 0
+
+    def __init__(self, day, month, year):
+        self.day = day
+        self.month = month
+        self.year = year
+
+def dateRange(start, end):
+    day = start.day
+    month = start.month
+    year = start.year
+
+    table = []
+    while year <= end.year and (month <= end.month or year < end.year) and (day <= end.day or month < end.month):
+        
+        table.append(str(month)+'/'+str(day)+'/'+str(year))
+        day += 1
+        
+        if day > monthsDays[month]:
+            month += 1
+            day = 1
+            if month > 12:
+                year += 1
+                month = 1
+    return table
+
+
+def getJson(filename):
+    data = {}
+    with open(filename) as csvFile:
+        
+        csvReader = csv.DictReader(csvFile)
+        for rows in csvReader:
+            id = rows['Country/Region']
+            
+            if id in data:
+
+                toPass = 4
+                for col in data[id]:
+                    if toPass > 0:
+                        toPass -= 1
+                        pass
+                    else:
+                        data[id][col] = int(data[id][col]) + int(rows[col])
+            else:
+                data[id] = rows
+    return data
+    
