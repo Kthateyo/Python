@@ -50,6 +50,8 @@ def addCountries(countries):
 
     i = 1
     for country in countries:
+        print('                                     ', end='\r')
+        print(str(i)+'/'+str(len(countries)), country, end='\r')
         countryData = data[country]
         # align their data to start from 100 confirmed cases
         countryDays = alignFrom(countryData, country)
@@ -76,7 +78,7 @@ def drawChart(sheet):
         per_million = ''
 
     chart.title = t_type + ' cases aligned from first ' + str(_starting_count)+', '+ per_million + ' for each country'
-    chart.y_axis.title = 'Number of ' + str(_type) + ' cases'
+    chart.y_axis.title = 'Number of ' + str(t_type).lower() + ' cases' + per_million
     chart.x_axis.title = 'Day'
     sheet.add_chart(chart, str(sheet.cell(1, sheet.max_column + 3).column_letter) + '2')
 
@@ -90,9 +92,11 @@ def printHelp():
     print('Usage:')
     print('    python ./app.py <type> [country0, country1, ..]')
     print('')
-    print('Example:')
+    print('Examples:')
     print('  python ./app.py confirmed Czechia Poland')
     print('  python ./app.py deaths Germany France "Korea, South"')
+    print('  python ./app.py recovered --per-million Russia China')
+    print('  python ./app.py confirmed --per-million --starting-count 200 Lithuania Belarus')
     print('')
     print('type:')
     print('  confirmed      Data about confirmed cases')
@@ -103,6 +107,7 @@ def printHelp():
     print('arguments:')
     print('  --days-limit <number>      Limits number of days')
     print('  --starting-count <number>  Number of cases when chart starts with for each country')
+    print('  --per-million              Calculates choosen data per million citizens for each country')
     print('')
 
 
@@ -122,46 +127,54 @@ def printCoutries():
         print(country)
 
 
-def checkCountries(countries):
+def checkCountries(args):
     countries = getCountries()
     for arg in args:
         if not arg in countries:
             print('')
             print('\033[1m'+'Propably wrong name of country. Check if you misspelled a name with \'countries\' command'+'\033[0m')
-            printHelp()
+            print('')
             exit()
 
 
+## Check arguments
+def checkArguments(args, _type, _file, _days_limit, _starting_count, _perMillion):
+
+    # Check if arguments are valid, if not print help and terminate app
+    if len(args) == 1 or not args[1] in ['confirmed', 'deaths', 'recovered', 'countries']:
+        printHelp()
+        exit()
+
+    # Set up global variable
+    _type = args[1]
+
+    # List available countries
+    if _type == 'countries':
+        printCoutries()
+        exit()
+    
+    # Set up global variable
+    _file = 'data/time_series_covid19_'+ _type +'_global.csv'
+
+    # Get flag arguments
+    opts, countries = getopt.getopt(args[2:], '', ['days-limit=', 'starting-count=', 'per-million'])
+    for opt, arg in opts:
+        if opt == '--days-limit':
+            _days_limit = int(arg)
+        elif opt == '--starting-count':
+            _starting_count = int(arg)
+        elif opt == '--per-million':
+            _perMillion = True
+
+    # Check for misspelled names
+    checkCountries(countries)
+
+    return countries, _type, _file, _days_limit, _starting_count, _perMillion
+
 ### Program
 
-# Check if arguments are valid, if not print help and terminate app
-if len(sys.argv) == 1 or not sys.argv[1] in ['confirmed', 'deaths', 'recovered', 'countries']:
-    printHelp()
-    exit()
-
-# Set up global variable
-_type = sys.argv[1]
-
-# List available countries
-if _type == 'countries':
-    printCoutries()
-    exit()
-
-# Set up global variable
-_file = 'data/time_series_covid19_'+ _type +'_global.csv'
-
-# Get flag arguments
-opts, args = getopt.getopt(sys.argv[2:], '', ['days-limit=', 'starting-count=', 'per-million'])
-for opt, arg in opts:
-    if opt == '--days-limit':
-        _days_limit = int(arg)
-    elif opt == '--starting-count':
-        _starting_count = int(arg)
-    elif opt == '--per-million':
-        _perMillion = True
-
-# Check for misspelled names
-checkCountries(args)
+# Check arguments
+args, _type, _file, _days_limit, _starting_count, _perMillion = checkArguments(sys.argv, _type, _file, _days_limit, _starting_count, _perMillion)
 
 # create workbook
 wb = xl.Workbook()
@@ -184,3 +197,6 @@ adjustWidth(ws)
 # save workbook
 path = getAbsolutePath('covid19.xlsx')
 wb.save(path)
+
+# Print Success
+print('Succesfully generated!!')

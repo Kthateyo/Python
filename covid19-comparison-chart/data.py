@@ -80,10 +80,7 @@ def getPopulation(countryName):
         countryName = 'Czech'
     elif countryName == 'Korea, South':
         countryName = 'Korea%20(Republic%20of)'
-
     countryName = countryName.replace(' ', '%20')
 
-    print(countryName, end=' ')
     data = requests.get('https://restcountries.eu/rest/v2/name/' + countryName).json()
-    print(data[0]['population'] / 1000000)
     return data[0]['population']

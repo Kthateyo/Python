@@ -4,7 +4,7 @@ import os
 def fillWithArray(sheet, row, col, array):
     # Iter through cells and fill
     for _row in range(row, row + len(array)):
-        sheet.cell(_row, col, int(array[_row - row]))
+        sheet.cell(_row, col, round(float(array[_row - row]), 2))
 
 
 def adjustWidth(ws):
