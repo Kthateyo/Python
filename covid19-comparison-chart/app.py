@@ -1,4 +1,4 @@
-import sys, getopt
+import sys, getopt, time
 import openpyxl as xl
 from data import getJson, dateRange, Date, getPopulation
 from utils import adjustWidth, fillWithArray, getAbsolutePath
@@ -87,10 +87,10 @@ def drawChart(sheet):
 def printHelp():
     print('')
     print('That console program takes data type and list of countries and produces')
-    print('a covid19.xlsx spreadsheet with a chart comparising those countries.')
+    print('a \'covid19 %Y-%m-%d %H-%M-%S.xlsx\' spreadsheet with a chart comparising those countries.')
     print('')
     print('Usage:')
-    print('    python ./app.py <type> [country0, country1, ..]')
+    print('  python ./app.py <type> [country0, country1, ..]')
     print('')
     print('Examples:')
     print('  python ./app.py confirmed Czechia Poland')
@@ -157,13 +157,13 @@ def checkArguments(args, _type, _file, _days_limit, _starting_count, _perMillion
     _file = 'data/time_series_covid19_'+ _type +'_global.csv'
 
     # Get flag arguments
-    opts, countries = getopt.getopt(args[2:], '', ['days-limit=', 'starting-count=', 'per-million'])
+    opts, countries = getopt.getopt(args[2:], 'd:s:m', ['days-limit=', 'starting-count=', 'per-million'])
     for opt, arg in opts:
-        if opt == '--days-limit':
+        if opt == '--days-limit' or opt == '-d':
             _days_limit = int(arg)
-        elif opt == '--starting-count':
+        elif opt == '--starting-count' or opt == '-s':
             _starting_count = int(arg)
-        elif opt == '--per-million':
+        elif opt == '--per-million' or opt == '-m':
             _perMillion = True
 
     # Check for misspelled names
@@ -195,7 +195,9 @@ drawChart(ws)
 adjustWidth(ws)
 
 # save workbook
-path = getAbsolutePath('covid19.xlsx')
+name = 'covid19 ' + str((time.strftime("%Y-%m-%d %H-%M-%S"))) + '.xlsx'
+print(name)
+path = getAbsolutePath(name)
 wb.save(path)
 
 # Print Success
