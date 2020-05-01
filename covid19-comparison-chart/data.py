@@ -1,5 +1,6 @@
-import csv, json
+import csv, json, os
 import openpyxl as xl
+from utils import getAbsolutePath
 
 monthsDays = {
     1:31,
@@ -48,7 +49,8 @@ def dateRange(start, end):
 
 def getJson(filename):
     data = {}
-    with open(filename) as csvFile:
+    abs_file_path = getAbsolutePath(filename)
+    with open(abs_file_path) as csvFile:
         
         csvReader = csv.DictReader(csvFile)
         for rows in csvReader:

@@ -1,7 +1,7 @@
 import sys, getopt
 import openpyxl as xl
 from data import getJson, dateRange, Date
-from utils import adjustWidth, fillWithArray
+from utils import adjustWidth, fillWithArray, getAbsolutePath
 
 ### Flags and Variables
 _days_limit = 0
@@ -36,6 +36,7 @@ def alignFrom(country):
 
     return countryDays
 
+
 # Add to spreadsheet data of countries
 def addCountries(countries):
         # get json of some countries
@@ -57,11 +58,12 @@ def drawChart(sheet):
     chart.add_data(values, titles_from_data=True)
     sheet.add_chart(chart, str(sheet.cell(1, sheet.max_column + 3).column_letter) + '3')
 
+
 # Prints help for usage of program
 def printHelp():
     print('')
-    print('That console program take data type and list of countries and produces ')
-    print('a covid19.xlsx spreadsheet with char comparising those countries.')
+    print('That console program takes data type and list of countries and produces')
+    print('a covid19.xlsx spreadsheet with chart comparising those countries.')
     print('')
     print('Usage:')
     print('    python ./app.py <type> [country0, country1, ..]')
@@ -81,25 +83,32 @@ def printHelp():
     print('  --starting-count <number>  Number of cases when chart starts with for each country')
     print('')
 
-# Print available countries
-def printCoutries():
-    data = getJson('time_series_covid19_confirmed_global.csv')
-    for country in data:
-        print(country)
 
-def checkCountries(countries):
-    data = getJson('time_series_covid19_confirmed_global.csv')
-
+# Returns list of countries
+def getCountries():
+    data = getJson('data/time_series_covid19_confirmed_global.csv')
     countries = []
     for country in data:
         countries.append(country)
+    return countries
 
+
+# Print available countries
+def printCoutries():
+    countries = getCountries()
+    for country in countries:
+        print(country)
+
+
+def checkCountries(countries):
+    countries = getCountries()
     for arg in args:
         if not arg in countries:
             print('')
             print('\033[1m'+'Propably wrong name of country. Check if you misspelled a name with \'countries\' command'+'\033[0m')
             printHelp()
             exit()
+
 
 ### Program
 
@@ -117,7 +126,7 @@ if _type == 'countries':
     exit()
 
 # Set up global variable
-_file = 'time_series_covid19_'+ _type +'_global.csv'
+_file = 'data/time_series_covid19_'+ _type +'_global.csv'
 
 # Get flag arguments
 opts, args = getopt.getopt(sys.argv[2:], '', ['days-limit=', 'starting-count='])
@@ -145,6 +154,9 @@ addCountries(countries)
 # create comparison chart
 drawChart(ws)
 
-# save workbook
+# Adjust width
 adjustWidth(ws)
-wb.save('covid.xlsx')
+
+# save workbook
+path = getAbsolutePath('covid19.xlsx')
+wb.save(path)

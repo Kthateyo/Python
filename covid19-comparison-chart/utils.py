@@ -1,8 +1,11 @@
+import os
+
 # Fill with array
 def fillWithArray(sheet, row, col, array):
     # Iter through cells and fill
     for _row in range(row, row + len(array)):
         sheet.cell(_row, col, int(array[_row - row]))
+
 
 def adjustWidth(ws):
     dims = {}
@@ -12,3 +15,10 @@ def adjustWidth(ws):
                 dims[cell.column_letter] = max((dims.get(cell.column_letter, 0), len(str(cell.value))))    
     for col, value in dims.items():
         ws.column_dimensions[col].width = value + 1
+
+
+def getAbsolutePath(path):
+    script_dir = os.path.dirname(__file__)
+    rel_path = path
+    abs_file_path = os.path.join(script_dir, rel_path)
+    return abs_file_path
