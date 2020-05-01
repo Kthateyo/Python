@@ -55,8 +55,10 @@ def addCountries(countries):
 def drawChart(sheet):
     values = xl.chart.Reference(sheet, 1, 1, sheet.max_column, sheet.max_row)
     chart = xl.chart.LineChart()
+    chart.width = 40
+    chart.height = 17
     chart.add_data(values, titles_from_data=True)
-    sheet.add_chart(chart, str(sheet.cell(1, sheet.max_column + 3).column_letter) + '3')
+    sheet.add_chart(chart, str(sheet.cell(1, sheet.max_column + 3).column_letter) + '2')
 
 
 # Prints help for usage of program
