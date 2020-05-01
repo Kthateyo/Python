@@ -58,6 +58,8 @@ def drawChart(sheet):
     chart.width = 40
     chart.height = 17
     chart.add_data(values, titles_from_data=True)
+    chart.y_axis.title = 'Number of ' + str(_type)
+    chart.x_axis.title = 'Day'
     sheet.add_chart(chart, str(sheet.cell(1, sheet.max_column + 3).column_letter) + '2')
 
 

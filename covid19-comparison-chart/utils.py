@@ -14,7 +14,7 @@ def adjustWidth(ws):
             if cell.value:
                 dims[cell.column_letter] = max((dims.get(cell.column_letter, 0), len(str(cell.value))))    
     for col, value in dims.items():
-        ws.column_dimensions[col].width = value + 1
+        ws.column_dimensions[col].width = value + 2
 
 
 def getAbsolutePath(path):
