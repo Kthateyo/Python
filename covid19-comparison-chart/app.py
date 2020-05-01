@@ -1,6 +1,6 @@
 import sys, getopt
 import openpyxl as xl
-from data import getJson, dateRange, Date
+from data import getJson, dateRange, Date, getPopulation
 from utils import adjustWidth, fillWithArray, getAbsolutePath
 
 ### Flags and Variables
@@ -8,11 +8,12 @@ _days_limit = 0
 _starting_count = 100
 _type = ''
 _file = ''
+_perMillion = False
 
 ### Function Definitions
 
 # Align country data, that it starts with starting_count value
-def alignFrom(country):
+def alignFrom(country, countryName):
     start = Date(22, 1, 20)
     end = Date(29,4,20)
 
@@ -20,12 +21,17 @@ def alignFrom(country):
         start = Date(22, 1, 2020)
         end = Date(29,4,2020)
 
+    countryPopulation = getPopulation(countryName)
     countryDays = []
     i = 0
     for date in dateRange(start, end):
-        cases = country[date]
-        if int(cases) > _starting_count:
-            countryDays.append(cases)
+        cases = int(country[date])
+        if cases > _starting_count:
+            if _perMillion == True:
+                countryDays.append( cases / (countryPopulation / 1000000) )
+            else:
+                countryDays.append(cases)
+
             i += 1
             
             if _days_limit > 0:
@@ -46,7 +52,7 @@ def addCountries(countries):
     for country in countries:
         countryData = data[country]
         # align their data to start from 100 confirmed cases
-        countryDays = alignFrom(countryData)
+        countryDays = alignFrom(countryData, country)
         ws.cell(1, i, country)
         fillWithArray(ws, 2, i, countryDays)
         i += 1
@@ -58,7 +64,19 @@ def drawChart(sheet):
     chart.width = 40
     chart.height = 17
     chart.add_data(values, titles_from_data=True)
-    chart.y_axis.title = 'Number of ' + str(_type)
+
+    t_type = str(_type)
+    t_type = t_type[0].upper() + t_type[1:]
+    if t_type[-1] == 's':
+        t_type = t_type[:-1]
+    
+    if _perMillion:
+        per_million = ' per million citizens'
+    else:
+        per_million = ''
+
+    chart.title = t_type + ' cases aligned from first ' + str(_starting_count)+', '+ per_million + ' for each country'
+    chart.y_axis.title = 'Number of ' + str(_type) + ' cases'
     chart.x_axis.title = 'Day'
     sheet.add_chart(chart, str(sheet.cell(1, sheet.max_column + 3).column_letter) + '2')
 
@@ -67,7 +85,7 @@ def drawChart(sheet):
 def printHelp():
     print('')
     print('That console program takes data type and list of countries and produces')
-    print('a covid19.xlsx spreadsheet with chart comparising those countries.')
+    print('a covid19.xlsx spreadsheet with a chart comparising those countries.')
     print('')
     print('Usage:')
     print('    python ./app.py <type> [country0, country1, ..]')
@@ -133,12 +151,14 @@ if _type == 'countries':
 _file = 'data/time_series_covid19_'+ _type +'_global.csv'
 
 # Get flag arguments
-opts, args = getopt.getopt(sys.argv[2:], '', ['days-limit=', 'starting-count='])
+opts, args = getopt.getopt(sys.argv[2:], '', ['days-limit=', 'starting-count=', 'per-million'])
 for opt, arg in opts:
     if opt == '--days-limit':
         _days_limit = int(arg)
     elif opt == '--starting-count':
         _starting_count = int(arg)
+    elif opt == '--per-million':
+        _perMillion = True
 
 # Check for misspelled names
 checkCountries(args)

@@ -1,4 +1,4 @@
-import csv, json, os
+import csv, json, os, requests
 import openpyxl as xl
 from utils import getAbsolutePath
 
@@ -69,3 +69,21 @@ def getJson(filename):
                 data[id] = rows
     return data
     
+
+# Returns population of given country
+def getPopulation(countryName):
+    
+
+    if countryName == 'US':
+        countryName = 'USA'
+    elif countryName == 'Czechia':
+        countryName = 'Czech'
+    elif countryName == 'Korea, South':
+        countryName = 'Korea%20(Republic%20of)'
+
+    countryName = countryName.replace(' ', '%20')
+
+    print(countryName, end=' ')
+    data = requests.get('https://restcountries.eu/rest/v2/name/' + countryName).json()
+    print(data[0]['population'] / 1000000)
+    return data[0]['population']
