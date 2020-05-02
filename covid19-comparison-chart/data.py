@@ -1,4 +1,4 @@
-import csv, json, os, requests
+import csv, json, os, requests, pathlib, time
 import openpyxl as xl
 from utils import getAbsolutePath
 
@@ -47,10 +47,49 @@ def dateRange(start, end):
     return table
 
 
-def getJson(filename):
+# Get csv file from the internet
+def getCSV(_type):
+
+    # Check for existing file
+    filename = 'time_series_covid19_' + _type + '_global.csv'
+    path = pathlib.Path(__file__).parent / 'cache'
+    filepath = path / filename
+
+
+    # if yes, decide if get csv again
+    isGonnaDownload = False
+    if path.exists():
+        if filepath.exists():
+            difference_time = (time.time() - filepath.stat().st_mtime) / 60 # Difference time in minutes
+            if difference_time > 10:
+                isGonnaDownload = True
+            else:
+                isGonnaDownload = False              
+        else:
+            isGonnaDownload = True
+    else:
+        isGonnaDownload = True
+        path.mkdir()
+
+    if isGonnaDownload:
+        # Get csv from Internet
+        url = 'https://data.humdata.org/hxlproxy/api/data-preview.csv?url=https%3A%2F%2Fraw.githubusercontent.com%2FCSSEGISandData%2FCOVID-19%2Fmaster%2Fcsse_covid_19_data%2Fcsse_covid_19_time_series%2Ftime_series_covid19_'+_type+'_global.csv&filename=time_series_covid19_'+_type+'_global.csv'
+        print('Downloading Data...')
+        r = requests.get(url)
+        
+        # Save it
+        if filepath.exists():
+            filepath.unlink()
+        filepath.touch()
+        filepath.write_bytes(r.content)
+    
+    return filepath
+
+
+def getJson(_type):
     data = {}
-    abs_file_path = getAbsolutePath(filename)
-    with open(abs_file_path) as csvFile:
+    filepath = getCSV(_type)
+    with open(filepath.resolve()) as csvFile:
         
         csvReader = csv.DictReader(csvFile)
         for rows in csvReader:
@@ -84,3 +123,4 @@ def getPopulation(countryName):
 
     data = requests.get('https://restcountries.eu/rest/v2/name/' + countryName).json()
     return data[0]['population']
+

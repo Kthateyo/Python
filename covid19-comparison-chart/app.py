@@ -1,6 +1,6 @@
 import sys, getopt, time
 import openpyxl as xl
-from data import getJson, dateRange, Date, getPopulation
+from data import getJson, dateRange, Date, getPopulation, getCSV
 from utils import adjustWidth, fillWithArray, getAbsolutePath
 
 ### Flags and Variables
@@ -17,9 +17,9 @@ def alignFrom(country, countryName):
     start = Date(22, 1, 20)
     end = Date(29,4,20)
 
-    if _type == 'confirmed':
-        start = Date(22, 1, 2020)
-        end = Date(29,4,2020)
+    # if _type == 'confirmed':
+    #     start = Date(22, 1, 2020)
+    #     end = Date(29,4,2020)
 
     countryPopulation = getPopulation(countryName)
     countryDays = []
@@ -45,9 +45,8 @@ def alignFrom(country, countryName):
 
 # Add to spreadsheet data of countries
 def addCountries(countries):
-        # get json of some countries
-    data = getJson(_file)
-
+    # get json of some countries
+    data = getJson(_type)
     i = 1
     for country in countries:
         print('                                     ', end='\r')
@@ -113,7 +112,7 @@ def printHelp():
 
 # Returns list of countries
 def getCountries():
-    data = getJson('data/time_series_covid19_confirmed_global.csv')
+    data = getJson(_type)
     countries = []
     for country in data:
         countries.append(country)
@@ -137,44 +136,41 @@ def checkCountries(args):
             exit()
 
 
-## Check arguments
-def checkArguments(args, _type, _file, _days_limit, _starting_count, _perMillion):
-
-    # Check if arguments are valid, if not print help and terminate app
-    if len(args) == 1 or not args[1] in ['confirmed', 'deaths', 'recovered', 'countries']:
-        printHelp()
-        exit()
-
-    # Set up global variable
-    _type = args[1]
-
-    # List available countries
-    if _type == 'countries':
-        printCoutries()
-        exit()
-    
-    # Set up global variable
-    _file = 'data/time_series_covid19_'+ _type +'_global.csv'
-
-    # Get flag arguments
-    opts, countries = getopt.getopt(args[2:], 'd:s:m', ['days-limit=', 'starting-count=', 'per-million'])
-    for opt, arg in opts:
-        if opt == '--days-limit' or opt == '-d':
-            _days_limit = int(arg)
-        elif opt == '--starting-count' or opt == '-s':
-            _starting_count = int(arg)
-        elif opt == '--per-million' or opt == '-m':
-            _perMillion = True
-
-    # Check for misspelled names
-    checkCountries(countries)
-
-    return countries, _type, _file, _days_limit, _starting_count, _perMillion
-
 ### Program
 
-# Check arguments
-args, _type, _file, _days_limit, _starting_count, _perMillion = checkArguments(sys.argv, _type, _file, _days_limit, _starting_count, _perMillion)
+## Check arguments
+# Check if arguments are valid, if not print help and terminate app
+args = sys.argv
+if len(args) == 1 or not args[1] in ['confirmed', 'deaths', 'recovered', 'countries']:
+    printHelp()
+    exit()
+
+# Set up global variable
+_type = args[1]
+
+# List available countries
+if _type == 'countries':
+    printCoutries()
+    exit()
+
+# Set up global variable
+_file = 'data/time_series_covid19_'+ _type +'_global.csv'
+
+# Get flag arguments
+opts, countries = getopt.getopt(args[2:], 'd:s:m', ['days-limit=', 'starting-count=', 'per-million'])
+for opt, arg in opts:
+    if opt == '--days-limit' or opt == '-d':
+        _days_limit = int(arg)
+    elif opt == '--starting-count' or opt == '-s':
+        _starting_count = int(arg)
+    elif opt == '--per-million' or opt == '-m':
+        _perMillion = True
+
+args = countries
+
+# Check for misspelled names
+checkCountries(countries)
+
 
 # create workbook
 wb = xl.Workbook()
@@ -196,9 +192,9 @@ adjustWidth(ws)
 
 # save workbook
 name = 'covid19 ' + str((time.strftime("%Y-%m-%d %H-%M-%S"))) + '.xlsx'
-print(name)
 path = getAbsolutePath(name)
 wb.save(path)
 
 # Print Success
 print('Succesfully generated!!')
+print(name)
