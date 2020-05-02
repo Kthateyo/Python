@@ -22,3 +22,4 @@ def getAbsolutePath(path):
     rel_path = path
     abs_file_path = os.path.join(script_dir, rel_path)
     return abs_file_path
+

@@ -5,7 +5,7 @@
 __pycache__/
 
 # Output
-covid19*.xlsx
+output
 
 # Download cache
 cache

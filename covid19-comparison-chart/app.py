@@ -1,13 +1,14 @@
-import sys, getopt, time
+import sys, getopt, time, pathlib
 import openpyxl as xl
 from data import getJson, dateRange, Date, getPopulation, getCSV
 from utils import adjustWidth, fillWithArray, getAbsolutePath
+from colorama import init, Fore
 
 ### Flags and Variables
 _days_limit = 0
 _starting_count = 100
 _type = ''
-_file = ''
+_output = pathlib.Path(__file__).parent / 'output'
 _perMillion = False
 
 ### Function Definitions
@@ -85,8 +86,7 @@ def drawChart(sheet):
 # Prints help for usage of program
 def printHelp():
     print('')
-    print('That console program takes data type and list of countries and produces')
-    print('a \'covid19 %Y-%m-%d %H-%M-%S.xlsx\' spreadsheet with a chart comparising those countries.')
+    print('That console program takes data type and list of countries and produces a \'covid19 %Y-%m-%d %H-%M-%S.xlsx\' spreadsheet with a chart comparising those countries.')
     print('')
     print('Usage:')
     print('  python ./app.py <type> [country0, country1, ..]')
@@ -104,9 +104,10 @@ def printHelp():
     print('  countries      Lists available countries')
     print('')
     print('arguments:')
-    print('  --days-limit <number>      Limits number of days')
-    print('  --starting-count <number>  Number of cases when chart starts with for each country')
-    print('  --per-million              Calculates choosen data per million citizens for each country')
+    print('  -d --days-limit <number>       Limits number of days')
+    print('  -s --starting-count <number>   Number of cases when chart starts with for each country')
+    print('  -m --per-million               Calculates choosen data per million citizens for each country')
+    print('  -o --output <folder_path>      Specifies output folder for generated .xlsx files')
     print('')
 
 
@@ -130,13 +131,14 @@ def checkCountries(args):
     countries = getCountries()
     for arg in args:
         if not arg in countries:
-            print('')
-            print('\033[1m'+'Propably wrong name of country. Check if you misspelled a name with \'countries\' command'+'\033[0m')
-            print('')
+            print(Fore.RED +'Propably wrong name of country. Check if you misspelled a name with \'countries\' command')
             exit()
 
 
 ### Program
+
+# Initialize colorama
+init()
 
 ## Check arguments
 # Check if arguments are valid, if not print help and terminate app
@@ -153,16 +155,15 @@ if _type == 'countries':
     printCoutries()
     exit()
 
-# Set up global variable
-_file = 'data/time_series_covid19_'+ _type +'_global.csv'
-
 # Get flag arguments
-opts, countries = getopt.getopt(args[2:], 'd:s:m', ['days-limit=', 'starting-count=', 'per-million'])
+opts, countries = getopt.getopt(args[2:], 'd:s:o:m', ['days-limit=', 'starting-count=', 'output=', 'per-million'])
 for opt, arg in opts:
     if opt == '--days-limit' or opt == '-d':
         _days_limit = int(arg)
     elif opt == '--starting-count' or opt == '-s':
         _starting_count = int(arg)
+    elif opt == '--output' or opt == '-o':
+        _output = pathlib.Path(str(arg))
     elif opt == '--per-million' or opt == '-m':
         _perMillion = True
 
@@ -192,9 +193,11 @@ adjustWidth(ws)
 
 # save workbook
 name = 'covid19 ' + str((time.strftime("%Y-%m-%d %H-%M-%S"))) + '.xlsx'
-path = getAbsolutePath(name)
+if not _output.exists():
+    _output.mkdir(parents=True)
+path = (_output.resolve() / name).absolute() # getAbsolutePath(name)
 wb.save(path)
 
 # Print Success
-print('Succesfully generated!!')
-print(name)
+print(Fore.BLUE + 'Succesfully generated!!')
+print(Fore.GREEN + str(path))
