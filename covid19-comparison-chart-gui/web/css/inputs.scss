@@ -1,0 +1,63 @@
+:root {
+  --input-bg: #f1f1f1;
+  --submit-bg: DodgerBlue;
+  --submit-text: #fff;
+  --ac-border: #d4d4d4;
+  --ac-bg: #fff;
+  --ac-hover-bg: #e9e9e9;
+  --ac-active-bg: DodgerBlue;
+  --ac-active-text: #fff;
+}
+
+.autocomplete {
+  /*the container must be positioned relative:*/
+  position: relative;
+  width: 100%;
+}
+
+input, select {
+  margin: 0.5rem 0;
+  padding: 10px;
+  background-color: var(--input-bg);
+  border: 1px solid transparent;
+  font-size: 16px;
+}
+
+input[type="text"] {
+  width: 100%;
+}
+
+input[type="submit"] {
+  background-color: var(--submit-bg);
+  color: var(--submit-text);
+}
+
+.autocomplete-items {
+  position: absolute;
+  border: 1px solid var(--ac-border);
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  /*position the autocomplete items to be the same width as the container:*/
+  top: 100%;
+  left: 0;
+  right: 0;
+}
+
+.autocomplete-items div {
+  padding: 10px;
+  cursor: pointer;
+  background-color: var(--ac-bg);
+  border-bottom: 1px solid var(--ac-border);
+}
+
+.autocomplete-items div:hover {
+  /*when hovering an item:*/
+  background-color: var(--ac-hover-bg);
+}
+
+.autocomplete-active {
+  /*when navigating through the items using the arrow keys:*/
+  background-color: var(--ac-active-bg) !important;
+  color: var(--ac-active-text);
+}

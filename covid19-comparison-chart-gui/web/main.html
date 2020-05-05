@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Ten css robi ładne inputy: pola, przyciski, checkboxy, listy -->
+    <!-- i listę podpowiedzi jak się wpisuje coś -->
+    <!-- Możesz go zmieniać jak umiesz, możesz też kompletnie wywalić -->
+    <link rel="stylesheet" href="css/inputs.css">
+    
+    <!-- Tu są moje style, proponuję to wywalić na pewno i zrobić od nowa -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Ten skrypt działa dopiero po połączeniu z pythonem -->
+    <!-- więc teraz jest bezużyteczny -->
+    <script type="text/javascript" src="/eel.js"></script>
+
+    <!-- Tu jest biblioteka do wykresów -->
+    <script src="js/Chart.bundle.js"></script>
+
+    <title>Covid 19 Comparer</title>
+
+</head>
+<body>
+    
+    <main id="main">
+        <div id="left" class="block">
+            <h2>Options</h2>
+            <div>
+                Type
+                <!-- Ten select z optionsami musi mieć dokładnie takie id -->
+                <!-- Te optionsy też muszą w środku zostać -->
+                <select id="type">
+                    <option value="confirmed">confirmed</option>
+                    <option value="deaths">deaths</option>
+                    <option value="recovered">recovered</option>
+                    <option value="active">active</option>
+                </select>
+            </div>
+            <div>
+                Align data
+                <input id="align" type="checkbox">
+                <div>
+                    Start from
+                    <input id="start-from" type="number" placeholder="100" style="width: 30%;">
+                </div>
+                <div>
+                    Days limit
+                    <input id="days-limit" type="number" placeholder="0" style="width: 30%;">
+                </div>
+            </div>
+            <div>
+                Per million citizens
+                <!-- Ten input musi mieć dokładnie takie id -->
+                <input id="per-million" type="checkbox">
+            </div>
+
+            <h2>Countries</h2>
+            <div id="countries">
+
+                <div class="autocomplete">
+                    <!-- Żeby podpowiedzi działały ten input musi być dokładnie jeden sam -->
+                    <!-- pod divem z klasą 'autocomplete' -->
+                    <input class="input" type="text" name="country" placeholder="Country">
+                </div>
+
+            </div>
+            <br>
+            <!-- Ten przycisk musi mieć id 'generate' -->
+            <input id="generate" type="submit" value="Generate">
+            <div id="state"></div>
+        </div>
+        <div id="right" class="block">
+            <!-- To canvas musi mieć id 'chart' -->
+            <!-- W tym jest generowany wykres -->
+            <div id="canvas-div" style="position: relative;">
+                <canvas id="chart"></canvas>
+            </div>
+        </div>
+    </main>   
+    
+    <!-- Ten skrypt daje listę podpowiedzi gdy się coś wpisuje -->
+    <script src="js/autocomplete.js"></script>
+    
+    <!-- Ten skrypt dodaje kolejne pola do wpisywania państw -->
+    <script src="js/inputs.js"></script>
+
+    <!-- Ten skrypt działa dopiero po połączeniu z pythonem -->
+    <!-- więc teraz jest bezużyteczny, ale póki co dałem -->
+    <!-- tymczasowe ręcznie wpisane dane -->
+    <!-- On generuje nowe wykresy -->
+    <script src="js/chartMaker.js"></script>
+</body>
+</html>
