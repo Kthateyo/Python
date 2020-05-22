@@ -19,7 +19,7 @@
     <!-- Tu jest biblioteka do wykresów -->
     <script src="js/Chart.bundle.js"></script>
 
-    <title>Covid 19 Comparer</title>
+    <title>Covid 19 Comparator</title>
 
 </head>
 <body>
@@ -31,29 +31,29 @@
                 Type
                 <!-- Ten select z optionsami musi mieć dokładnie takie id -->
                 <!-- Te optionsy też muszą w środku zostać -->
-                <select id="type">
-                    <option value="confirmed">confirmed</option>
-                    <option value="deaths">deaths</option>
-                    <option value="recovered">recovered</option>
-                    <option value="active">active</option>
+                <select id="type" title="Select what data you're interested in.">
+                    <option value="confirmed" title="Confirmed cases of Covid 19.">confirmed</option>
+                    <option value="deaths" title="Confirmed deaths caused by Covid 19.">deaths</option>
+                    <option value="recovered" title="Confirmed cases of recovered from Covid 19.">recovered</option>
+                    <option value="active" title="Active cases of Covid 19. Active cases = confirmed - (deaths + recovered)">active</option>
                 </select>
             </div>
             <div>
                 Align data
-                <input id="align" type="checkbox">
+                <input id="align" type="checkbox" title="Align origin of chart to the very same moment of epidemy in compared countries.">
                 <div>
                     Start from
-                    <input id="start-from" type="number" placeholder="100" style="width: 30%;">
+                    <input id="start-from" type="number" placeholder="100" style="width: 30%;" title="Chart for every selected country will begin when each of them had this number of cases, which type was selected ealier.">
                 </div>
                 <div>
                     Days limit
-                    <input id="days-limit" type="number" placeholder="0" style="width: 30%;">
+                    <input id="days-limit" type="number" placeholder="0" style="width: 30%;" title="You can limit number of days showed in the chart. Default zero means show every day.">
                 </div>
             </div>
             <div>
                 Per million citizens
                 <!-- Ten input musi mieć dokładnie takie id -->
-                <input id="per-million" type="checkbox">
+                <input id="per-million" type="checkbox" title="If checked, number of selected type of cases are calculated per million citizens in each country.">
             </div>
 
             <h2>Countries</h2>
@@ -71,13 +71,12 @@
             <input id="generate" type="submit" value="Generate">
             <div id="state"></div>
         </div>
-        <div id="right" class="block">
+        <div id="right" class="block" style="position: relative;">
             <!-- To canvas musi mieć id 'chart' -->
             <!-- W tym jest generowany wykres -->
-            <div id="canvas-div" style="position: relative;">
-                <canvas id="chart"></canvas>
-            </div>
+            <canvas id="chart"></canvas>
         </div>
+        <div style="clear: both;"></div>
     </main>   
     
     <!-- Ten skrypt daje listę podpowiedzi gdy się coś wpisuje -->
@@ -91,5 +90,7 @@
     <!-- tymczasowe ręcznie wpisane dane -->
     <!-- On generuje nowe wykresy -->
     <script src="js/chartMaker.js"></script>
+
+    <script src="js/resize.js"></script>
 </body>
 </html>
